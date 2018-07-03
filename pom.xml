@@ -22,7 +22,7 @@
             <id>daniel.aguil</id>
             <name>Aguill Mallea, Daniel Eugenio</name>
             <email>danielaguilmallea@gmail.com</email>
-            <organization>Universidad de Tierra del Fuego</organization>
+            <organization>Universidad Nacional de Tierra del Fuego</organization>
             <roles>
                 <role>desarrollador</role>
             </roles>
@@ -31,7 +31,16 @@
             <id>german.tejero</id>
             <name>Tejero, Carlos German</name>
             <email>german.tejero@gmail.com</email>
-            <organization>Universidad de Tierra del Fuego</organization>
+            <organization>Universidad Nacional de Tierra del Fuego</organization>
+            <roles>
+                <role>desarrollador</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>jonatan.mamani</id>
+            <name>Mamani Ramirez, Jonatan</name>
+            <email>jonatan.mamani.01@gmail.com</email>
+            <organization>Universidad Nacional de Tierra del Fuego</organization>
             <roles>
                 <role>desarrollador</role>
             </roles>

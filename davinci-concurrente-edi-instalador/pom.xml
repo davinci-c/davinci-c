@@ -17,7 +17,7 @@
     <packaging>pom</packaging>
   
     <name>davinci-concurrente-edi-instalador</name>
-    <url>davinci-c.sourceforge.net</url>
+    <url>https://davinci-c.github.io/web/</url>
   
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
