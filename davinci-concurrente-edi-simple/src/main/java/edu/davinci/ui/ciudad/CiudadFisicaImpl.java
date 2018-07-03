@@ -32,7 +32,7 @@ public class CiudadFisicaImpl extends CiudadSimpleGuiImpl {
 
         try {
 
-            //System.out.println("habilitar robotfisico: " + OpcionesInterprete.getHabilitarRobotFisico());
+//            System.out.println("habilitar robotfisico: " + OpcionesInterprete.getHabilitarRobotFisico());
             if (OpcionesInterprete.getHabilitarRobotFisico()) {
                 System.out.println("IP robot: " + OpcionesInterprete.getIpRobotFisico());
             }
