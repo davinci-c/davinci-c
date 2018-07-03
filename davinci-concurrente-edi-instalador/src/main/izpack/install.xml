@@ -1,0 +1,67 @@
+<izpack:installation version="5.0"
+                     xmlns:izpack="http://izpack.org/schema/installation"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
+ 
+    <info>
+        <appname>DaVinciConcurrente</appname>
+        <appversion>1.2.1</appversion>
+        <javaversion>1.7</javaversion>
+    </info>
+ 
+    <guiprefs width="800" height="600" resizable="no">
+        <modifier key="useHeadingPanel"        value="yes"/>
+        <modifier key="useHeadingForSummary"   value="yes"/>
+        <modifier key="headingImageOnLeft"     value="yes"/>
+        <modifier key="headingLineCount"       value="2"/>
+        <modifier key="headingPanelCounter"    value="text"/>
+        <modifier key="headingPanelCounterPos" value="inHeading"/>
+    </guiprefs>
+ 
+    <variables>
+        <variable name="DesktopShortcutCheckboxEnabled" value="true"/>
+    </variables>
+ 
+    <locale>
+        <langpack iso3="spa"/>
+    </locale>
+ 
+    <natives>
+        <native type="izpack" name="ShellLink.dll"/>
+        <native type="izpack" name="ShellLink_x64.dll"/>
+    </natives>
+ 
+    <resources>
+        <res id="Heading.image"         src="titulo.png"/>
+        <res id="Installer.image"       src="panel.jpg" />
+        <res id="LicencePanel.licence"  src="Licencia.txt" encoding="utf-8" />
+        <res id="Win_shortcutSpec.xml"  src="Win_shortcutSpec.xml" />
+        <res id="Unix_shortcutSpec.xml" src="Unix_shortcutSpec.xml" />
+    </resources>
+ 
+    <panels>
+        <panel classname="HelloPanel" />
+        <panel classname="LicencePanel" />
+        <panel classname="TargetPanel"/>
+        <panel classname="InstallPanel"/>
+        <panel classname="ShortcutPanel" />
+        <panel classname="FinishPanel"/>
+    </panels>
+ 
+    <packs>
+        <pack name="Programa" required="yes">
+            <description>Los archivos necesarios para DaVinci Concurrente</description>
+            <file src="icono.png"       targetdir="$INSTALL_PATH/" />
+            <file src="icono.ico"       targetdir="$INSTALL_PATH/" />
+            <file src="Licencia.txt"    targetdir="$INSTALL_PATH/" />
+            <file src="desinstalar.png" targetdir="$INSTALL_PATH/" />
+            <file src="desinstalar.ico" targetdir="$INSTALL_PATH/" /> 
+            <singlefile src="davinci-concurrente-edi-simple-1.0-SNAPSHOT.jar"         target="$INSTALL_PATH/davinci-concurrente-edi-simple.jar" />
+            <file src="davinci-concurrente-1.0-SNAPSHOT.jar"                          targetdir="$INSTALL_PATH/lib/" />
+            <file src="davinci-concurrente-edi-editor-1.0-SNAPSHOT.jar"               targetdir="$INSTALL_PATH/lib/" />
+            <file src="davinci-concurrente-edi-editor-autocompletar-1.0-SNAPSHOT.jar" targetdir="$INSTALL_PATH/lib/" />
+            <file src="swing-layout-1.0.3.jar"                                        targetdir="$INSTALL_PATH/lib/" />
+        </pack>
+    </packs>
+    
+</izpack:installation>

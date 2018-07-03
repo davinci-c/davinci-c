@@ -1,0 +1,22 @@
+programa prueba
+hilos
+	hilo juan
+	comenzar
+		iniciar
+		mover
+		repetir 10
+			informar("juan en ",posCa)
+	fin
+
+	hilo pepe
+	comenzar
+		iniciar
+		mover
+		repetir 10
+			informar("pepe en ",posCa)
+	fin
+comenzar
+	arrancar juan
+	arrancar pepe
+	informar("fin cuerpor principal")
+fin

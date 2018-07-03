@@ -1,0 +1,20 @@
+programa tp_4_6
+{
+Escriba un programa que le permita al robot recorrer la avenida 43
+desde la calle 38 hasta la calle 15 recogiendo todas las flores que
+encuentre..
+}
+comenzar
+	iniciar
+	Pos(43,38)
+	derecha derecha
+	repetir 23
+		comenzar
+		si(HayFlorEnLaEsquina)
+			tomarFlor
+		mover
+		fin
+	si(HayFlorEnLaEsquina)
+		tomarFlor
+	informar(posca)
+fin

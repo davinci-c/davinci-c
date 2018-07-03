@@ -1,0 +1,14 @@
+programa tp_4_1
+{
+Escriba un programa que le permita al robot recorrer el perímetro del
+cuadrado determinado por (1,1) y (2,2).
+}
+comenzar
+	iniciar
+
+	repetir 4
+		comenzar
+		mover
+		derecha
+		fin
+fin

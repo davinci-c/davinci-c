@@ -1,0 +1,25 @@
+programa modulo_
+
+subprogramas
+
+	procedimiento modulo(en dividendo:numero; en divisor:numero; es resto:numero)
+	variables
+		cociente:numero
+	comenzar
+		cociente := dividendo / divisor
+		resto := dividendo - (cociente * divisor ) 
+	fin
+
+variables
+	i:numero
+	resultado:numero
+comenzar
+	i := 10
+	
+	repetir i
+		comenzar
+		modulo(i,4,resultado)
+		informar(resultado)
+		fin
+fin
+		

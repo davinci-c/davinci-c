@@ -1,0 +1,9 @@
+programa unRobot
+
+comenzar
+	Informar("arrancando robot")
+	iniciar 
+	repetir 5
+		mover
+	informar("fin robot")
+fin

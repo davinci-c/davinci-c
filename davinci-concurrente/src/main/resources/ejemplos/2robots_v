@@ -1,0 +1,35 @@
+programa interbloqueo
+variables
+  fin_robot1:semaforoBinario
+  fin_robot2:semaforoBinario
+
+hilos
+  hilo robot1(en avenida:numero)
+  comenzar
+    iniciar
+		Pos(avenida,1)
+		repetir 9
+		  mover
+  fin
+
+  hilo robot2(en avenida:numero)
+  comenzar
+		iniciar
+		Pos(avenida,10)
+		derecha derecha derecha
+		repetir 9
+		  mover
+  fin
+
+comenzar
+
+  iniciarSemaforo(fin_robot1)
+  iniciarSemaforo(fin_robot2)
+	mientras v
+		comenzar
+		arrancar robot1(aleatorio(10)+1) 
+  	arrancar robot2(aleatorio(10)+1)
+  	esperar(fin_robot1)
+  	esperar(fin_robot2)
+    fin
+fin

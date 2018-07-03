@@ -1,0 +1,4 @@
+programa prueba
+comenzar
+	informar("hola mundo")
+fin

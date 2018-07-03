@@ -1,0 +1,20 @@
+programa unrobot
+variables
+  cuadras:numero
+comenzar
+  pedir(cuadras)
+  si(cuadras>7)
+    cuadras := aleatorio(7)+1
+  iniciar
+  repetir 3
+    comenzar
+    repetir 4
+      comenzar
+      repetir cuadras
+        mover
+      derecha
+      fin
+    pos(posAv+1,posCa+1)
+    fin
+      
+fin

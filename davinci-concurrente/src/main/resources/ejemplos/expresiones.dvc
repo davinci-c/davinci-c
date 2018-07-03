@@ -1,0 +1,22 @@
+programa expresiones
+variables
+	compartida:numero
+
+hilos
+	hilo suma
+	comenzar
+		compartida := +1 +2 +3 +4 +5
+	fin
+
+	hilo resta
+	comenzar
+		compartida := -1 -2 -3 -4 -5
+	fin
+
+comenzar
+	compartida := 0
+	arrancar suma
+	arrancar resta
+	
+	informar(compartida)
+fin

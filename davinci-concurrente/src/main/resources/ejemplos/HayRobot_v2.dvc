@@ -1,0 +1,39 @@
+programa tres_cuadrados
+subprogramas
+	procedimiento tarea(en av:numero; en ca:numero ; en largo:numero)
+	comenzar
+		iniciar
+		Pos(av,ca)
+		mientras v
+			comenzar
+			repetir 4
+				comenzar
+				mientras(HayRobot) comenzar fin
+				mover
+				fin
+			derecha
+			fin
+	fin
+hilos
+	hilo robot1
+	comenzar
+		tarea(3,3, 3)
+	fin
+
+	hilo robot2
+	comenzar
+		tarea(2,2,5)
+	fin
+
+       hilo robot3
+	comenzar
+		tarea(1,1, 7)
+	fin
+comenzar
+ {planificador round robin, quantum=10 no presente problema. 
+   planificador aleatorio, se visualiza el error}
+	Informar("arrancando robots...")
+	arrancar robot1
+	arrancar robot3
+	arrancar robot2
+fin

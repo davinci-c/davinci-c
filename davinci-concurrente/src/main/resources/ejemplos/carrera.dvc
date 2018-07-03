@@ -1,0 +1,26 @@
+programa carrera
+variables
+	id:numero
+	
+subprogramas 
+	procedimiento correr(en nombre:numero)
+	comenzar
+		repetir 10
+				informar(nombre)
+	fin
+
+hilos
+	hilo robot(en robot:numero)
+	comenzar
+		correr(robot)
+	fin
+
+comenzar
+	id:=0
+	repetir 5
+		comenzar
+		arrancar robot(id)
+		id := id + 1
+		fin
+
+fin

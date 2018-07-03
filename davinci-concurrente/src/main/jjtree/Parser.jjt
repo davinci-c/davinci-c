@@ -1,0 +1,1519 @@
+/**
+ * JavaCC file
+ */
+ 
+options {
+    MULTI=true;
+    NODE_EXTENDS="CustomNode";
+    TRACK_TOKENS=true;
+    DEBUG_PARSER=true;
+    STATIC=false;
+    IGNORE_CASE=true;
+    ERROR_REPORTING=true;
+    UNICODE_INPUT = false;
+}
+PARSER_BEGIN(Parser)
+
+package edu.davinci.lenguaje;
+
+import java.text.MessageFormat;
+import edu.davinci.utils.Resource;
+
+public class Parser{
+	
+	
+	public Node rootNode() {
+    	return jjtree.rootNode();
+  	}
+
+  	//**********************************************************************//
+  	//****************** METODOS HELPERS COMPILACION **********************//
+
+    SymbolTable st_identificador = new SymbolTableImpl();
+    SymbolTable st_subprograma   = new SymbolTableImpl();
+    SymbolTable st_hilo 	 = new SymbolTableImpl();
+    
+    private String ambito="";
+    private int definicion;
+
+	/**
+	* Retorna el ambito/contexto donde nos encontramos 
+	*/
+     String getAmbito(){
+		return ambito;
+	}
+
+    /**
+	*
+	*/
+     void setAmbito(String amb){
+      ambito = amb;
+    }
+
+    /**
+	*
+	*/
+     int getDefinicion(){
+		return definicion;
+	}
+
+    /**
+	*
+	*/
+     void setDefinicion(int def){
+      definicion = def;
+    }
+
+	/**
+	*
+	*/
+     public void verificarIdentificador(Token t)throws ParseException{  	
+		//verificamos el ambito del identificador
+  	    if(getDefinicion()==0){
+  	        //se corresponde con un identificador global  
+	    	if(!st_identificador.verificarDeclaracion(t.image))
+	    		//System.out.println(MessageFormat.format(Resource.getString("parser.identificadorNoDefinido"), id));
+				throw new ParseException(MessageFormat.format(Resource.getString("parser.identificador.desconocido"), t.image,t.beginLine,t.beginColumn));
+
+	    }else if(getDefinicion()== SUBPROGRAM){
+	    	//se corresponde con un identificador de procedimiento
+	    	String procedimiento = getAmbito();
+	    	if(!st_subprograma.verificarDeclaracion(procedimiento, t.image))
+	    		//verificamos si esta definido como global
+	    		if(!st_identificador.verificarDeclaracion(t.image))
+					throw new ParseException(MessageFormat.format(Resource.getString("parser.procedimiento.identificador.desconocido"),  t.image,t.beginLine,t.beginColumn));
+
+	    }else if(getDefinicion()==THREADS){
+	      	//se corresponde con un identificador de hilo
+	    	String hilo = getAmbito();
+	    	if(!st_hilo.verificarDeclaracion(hilo, t.image))
+	    		//verificamos si esta definido como global
+	    		if(!st_identificador.verificarDeclaracion(t.image))
+    				throw new ParseException(MessageFormat.format(Resource.getString("parser.hilo.identificador.desconocido"),  t.image,t.beginLine,t.beginColumn));
+					
+	    }
+
+   		
+  	}
+
+  	/**
+	*
+	*/
+     public void verificarSubprograma(Token identificador)throws ParseException{  	
+   		if(!st_subprograma.verificarDeclaracion(identificador.image))
+			throw new ParseException(MessageFormat.format(Resource.getString("parser.procedimiento.identificador.desconocido"), identificador.image, identificador.beginLine, identificador.beginColumn));
+  	}
+
+  	/**
+	*
+	*/
+     public void verificarHilo(Token t)throws ParseException{
+       
+   		if(!st_hilo.verificarDeclaracion(t.image))
+   			throw new ParseException(MessageFormat.format(Resource.getString("parser.hilo.identificador.desconocido"),  t.image,t.beginLine,t.beginColumn));
+			//throw new ParseException(MessageFormat.format(Resource.getString("parser.hilo.identificador.desconocido"), id));
+  	}
+  	
+	
+	/**
+	*
+	*/
+  	 public void insertarIdentificador(Token t, int type)throws ParseException{
+  	   String id = t.image;
+  	  	//verificamos el ambito del identificador
+  	  	if(getDefinicion()==0){
+  	  		//se corresponde con un identificador global  
+	    	if(!st_identificador.agregarSimbolo(id, type))
+  				throw new ParseException(MessageFormat.format(Resource.getString("parser.identificador.duplicado"), id,t.beginLine,t.beginColumn));
+	    	  
+	    }else if(getDefinicion()==SUBPROGRAM){
+	    	//se corresponde con un identificador global
+	    	String procedimiento = getAmbito();  
+	    	if(!st_subprograma.agregarSimbolo(procedimiento,id, type))
+	    	  throw new ParseException(MessageFormat.format(Resource.getString("parser.procedimiento.identificador.duplicado"),procedimiento, id,t.beginLine,t.beginColumn));
+	    	  
+	    }else if(getDefinicion()==THREADS){
+	        String hilo = getAmbito();  
+	    	if(!st_hilo.agregarSimbolo(hilo, id, type))
+	    	  throw new ParseException(MessageFormat.format(Resource.getString("parser.hilo.identificador.duplicado"), hilo,id,t.beginLine,t.beginColumn));
+	    }
+  	}
+
+	/**
+	*
+	*/
+  	public void insertarSubprograma(Token t)throws ParseException{
+  	   String id = t.image;
+    	if(!st_subprograma.agregarSimbolo(id, SUBPROGRAM))
+    		throw new ParseException(MessageFormat.format(Resource.getString("parser.identificador.duplicado"),id,t.beginLine,t.beginColumn));
+    	  
+  	}
+
+        public void insertarTipoFuncion(Token t, int type)throws ParseException{
+  	   String id = t.image;
+    	   st_subprograma.setTipo(id, type);
+  	}
+
+	/**
+	*
+	*/
+  	 public void insertarHilo(Token t)throws ParseException{
+  	   String id = t.image;
+    	if(!st_hilo.agregarSimbolo(id, THREAD))
+    		throw new ParseException(MessageFormat.format(Resource.getString("parser.identificador.duplicado"),id,t.beginLine,t.beginColumn));
+    		  
+  	}
+
+  	/**
+	*
+	*/
+  	 public int obtenerTipo(Token t)throws ParseException{
+		String id = t.image;
+		//verificamos el ambito del identificador
+  	  	if(getDefinicion()==0){
+  	  		//se corresponde con un identificador global  
+	    	return st_identificador.getTipo(id);
+	    }else if(getDefinicion()==SUBPROGRAM){
+	    	//se corresponde con un identificador de procedimiento
+	    	String procedimiento = getAmbito();
+	    	//verificamos si es global
+	    	if(st_subprograma.getTipo(procedimiento, id)==0)
+				return st_identificador.getTipo(id);
+	    	else
+	    		return st_subprograma.getTipo(procedimiento, id);
+	    }else if(getDefinicion()==THREADS){
+	    	//se corresponde con un identificador de hilo
+	    	String hilo = getAmbito();
+	    	//verificamos si es global
+	    	if(st_hilo.getTipo(hilo, id)==0)
+				return st_identificador.getTipo(id);
+	    	else 
+	    		return st_hilo.getTipo(hilo, id);
+	    }else
+			throw new ParseException(MessageFormat.format(Resource.getString("parser.identificador.incompatible"), id,t.beginLine,t.beginColumn));
+  	}
+
+        public int obtenerTipoFuncion(Token t)throws ParseException{
+		String id = t.image;
+	    	
+                //retornamos el tipo
+	    	return st_subprograma.getTipo(id);
+        }
+
+	/**
+	*
+	*/
+  	 public void verificarTipos(Token t,int tipoA, int tipoB)throws ParseException{
+  	    //La verificacion de tipos del los semaforos es diferente al resto
+		if (tipoB == SEMAPHORE){
+		  	if(tipoA != SEMAPHORE_BINARY && tipoA != SEMAPHORE_GENERAL)
+			  	throw new ParseException(MessageFormat.format(Resource.getString("parser.tipo.incompatible"), t.beginLine,t.beginColumn));
+		}else{
+		  	//el resto de los tipos
+			if (tipoA!=tipoB)
+				throw new ParseException(MessageFormat.format(Resource.getString("parser.tipo.incompatible"), t.beginLine,t.beginColumn));
+				//System.out.println(MessageFormat.format(Resource.getString("parser.tiposDeDatoIncompatibles"), t.beginLine,t.beginColumn));
+			
+		}	
+  	}
+
+	/**
+	*
+	*/
+  	 public void verificarTipos(Token t,int tipoA, int tipoB, int operador)throws ParseException{
+		if (tipoA!=tipoB)
+				throw new ParseException(MessageFormat.format(Resource.getString("parser.tipo.incompatible"), t.beginLine,t.beginColumn));
+        else{
+          //Tipos coinciden, verificamos si tambien con el operador
+          if((operador==EQ)|(operador==NE)){
+			  if((tipoA==SEMAPHORE_BINARY)|(tipoA==SEMAPHORE_GENERAL))
+			  		throw new ParseException(MessageFormat.format(Resource.getString("parser.tipo.incompatible"), t.beginLine,t.beginColumn));
+		  }else if((operador==PLUS)|(operador==LE)|(operador==GT)){
+			  if(tipoA==BOOLEAN)
+			  		throw new ParseException(MessageFormat.format(Resource.getString("parser.tipo.incompatible"), t.beginLine,t.beginColumn));
+		  }else if((operador==MINUS)|(operador==PROD)|(operador==DIV)|(operador==MOD)){
+			  if((tipoA==BOOLEAN)|(tipoA==STRING))
+			  		throw new ParseException(MessageFormat.format(Resource.getString("parser.tipo.incompatible"), t.beginLine,t.beginColumn));
+		  }else if((operador==OR)|(operador==AND)){
+			  if((tipoA==INTEGER)|(tipoA==STRING))
+			  		throw new ParseException(MessageFormat.format(Resource.getString("parser.tipo.incompatible"), t.beginLine,t.beginColumn));
+		  }
+	    }
+  	}
+
+  	
+	//El padre lo da el ambito
+	 public void agregarParametroProcedimiento(Token t,int type, int input_output)throws ParseException{
+	    String id = t.image;
+	    String padre=getAmbito();
+		try
+		{	
+		    //establecemos si el parametro q agregamos es de salida
+		    boolean esDeSalida=input_output==OUTPUT |input_output==INPUTOUTPUT;
+		    st_subprograma.agregarParametro(padre,id,type,esDeSalida);
+		}catch(Exception e){
+		  throw new ParseException(MessageFormat.format(Resource.getString("parser.procedimiento.parametro.incompatible"), padre,id,t.beginLine,t.beginColumn));
+		    
+		}    	
+  	}
+
+  	 public void verificarParametroSubprograma(Token identificador,int type, int input_output, int order)throws ParseException{
+  	   String nombre = identificador.image;
+  	    //verificamos si el parametro con el q llamamos es de salida
+	    boolean esDeSalida=input_output==OUTPUT |input_output==INPUTOUTPUT;
+	    if(!st_subprograma.verificarParametro(nombre,type,esDeSalida,order))
+	    	throw new ParseException(MessageFormat.format(Resource.getString("parser.procedimiento.argumento.incompatible"), identificador.beginLine,identificador.beginColumn));
+	    	
+  	}
+
+  	 public void verificarCantidadParametrosSubprograma(Token identificador,int cant)throws ParseException{
+  	   String nombre = identificador.image;
+	    if(!st_subprograma.verificarCantidadDeParametros(nombre,cant))
+	    	throw new ParseException(MessageFormat.format(Resource.getString("parser.procedimiento.parametro.cantidad.diferente"), identificador.beginLine,identificador.beginColumn));
+  	}
+
+	 public void agregarParametroHilo(Token t,int type)throws ParseException{
+	    String id = t.image;
+		String padre=getAmbito();
+		try
+		{	
+		    //establecemos si el parametro q agregamos es de salida
+		    boolean esDeSalida=false;
+		    st_hilo.agregarParametro(padre,id,type,esDeSalida);
+		}catch(Exception e){
+		    throw new ParseException(MessageFormat.format(Resource.getString("parser.procedimiento.parametro.incompatible"), padre,id,t.beginLine,t.beginColumn));
+		}    	
+  	}
+
+	 public void verificarParametroHilo(Token t,int type, int order)throws ParseException{
+  	    //verificamos si el parametro con el q llamamos es de salida
+	    boolean esDeSalida=false;
+	    if(!st_hilo.verificarParametro(t.image,type,esDeSalida,order))
+	    	throw new ParseException(MessageFormat.format(Resource.getString("parser.hilo.argumento.incompatible"), t.beginLine,t.beginColumn));
+	    	
+  	}
+
+  	 public void verificarCantidadParametrosHilo(Token t,int cant)throws ParseException{
+	    if(!st_hilo.verificarCantidadDeParametros(t.image,cant))
+	    	throw new ParseException(MessageFormat.format(Resource.getString("parser.hilo.parametro.cantidad.diferente"), t.beginLine,t.beginColumn));
+	    	
+  	}
+  	
+}
+PARSER_END(Parser)
+
+/* SEPARADORES */
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+/* COMENTARIOS */
+
+SPECIAL_TOKEN :
+{
+  <SINGLE_LINE_COMMENT: "//" ( ~["\n","\r"] )* ("\n" | "\r" | "\r\n") >
+|
+  //<MULTI_LINE_COMMENT: "/*" ( ~["*"] | ("*")+ ~["*","/"] )* ("*")+ "/" >
+  <MULTI_LINE_COMMENT: "{" ( ~["}"] )* "}" >
+}
+
+
+/* PALABRAS RESERVADAS */
+
+TOKEN :
+{
+  < BOOLEAN: "logico" >
+| < STRING: "texto" >
+| < INTEGER: "numero" >
+| < TRUE: "v" >
+| < FALSE: "f" >
+| < PROGRAM: "programa" >
+| < SUBPROGRAM: "subprogramas" >
+| < PROCEDURE: "procedimiento" >
+| < FUNCTION: "funcion" >
+| < RETURN: "retornar" >
+| < INPUT: "en" >
+| < OUTPUT: "sa" >
+| < INPUTOUTPUT: "es" >
+| < VAR: "variables" >
+| < BEGIN: "comenzar" >
+| < IF: "si" >
+| < ELSE: "sino" >
+| < WHILE: "mientras" >
+| < REPEAT: "repetir" >
+| < END: "fin" >
+| < START: "iniciar" >
+| < MOVE: "mover" >
+| < RIGHT: "derecha" >
+| < TAKEFLOWOR: "tomarFlor" >
+| < TAKEPAPER: "tomarPapel" >
+| < PUTFLOWER: "depositarFlor" >
+| < PUTPAPER: "depositarPapel" >
+
+| < POSAV :"PosAv" >
+| < POSCA :"PosCa" >
+| < HAYFLORENLAESQUINA :"HayFlorEnLaEsquina" >
+| < HAYFLORENLABOLSA: "HayFlorEnLaBolsa" >
+| < HAYPAPELENLAESQUINA :"HayPapelEnLaEsquina" >
+| < HAYPAPELENLABOLSA :"HayPapelEnLaBolsa" >
+| < HAYOBSTACULO :"HayObstaculo" >
+| < HAYROBOT : "HayRobot" >
+| < MESSAGE: "Informar" >
+| < READ: "Pedir">
+| < POSITION: "Pos">
+
+| < THREADS: "hilos" >
+| < THREAD: "hilo" >
+| < THREAD_START: "arrancar" >
+
+| < SEMAPHORE: "_semaforo_" >
+| < SEMAPHORE_BINARY: "semaforoBinario">
+| < SEMAPHORE_GENERAL: "semaforoGeneral">
+| < SEMAPHORE_INIT: "iniciarSemaforo" >
+| < SIGNAL: "Avisar">
+| < WAIT  : "Esperar">
+
+| < RANDOM  : "Aleatorio">
+| < LENGTH  : "Longitud">
+| < SUBSTRING  : "Sustraer">
+| < NUMBERTOTEXT : "NumeroATexto">
+| < TEXTTONUMBER : "TextoANumero">
+| < LOGICTOTEXT  : "LogicoATexto">
+
+| < LOWERCASE  : "Minuscula">
+| < UPPERCASE  : "Mayuscula">
+| < TRIM  : "Cortar">
+| < REPLACE  : "Reemplazar">
+| < STARTSWITH  : "Comienzacon">
+| < ENDSWITH  : "Terminacon">
+| < INDEXOF  : "Indicede">
+
+
+| < SQRT  : "Raiz">
+| < POW  : "Potencia">
+| < MAX  : "MayorValor">
+| < SIN  : "Seno">
+| < COS  : "Coseno">
+| < TAN  : "Tangente">
+| < LOG  : "Logaritmo">
+
+| < RANDOMLET  : "LetraAleatoria">
+
+}
+
+/* LITERALES */
+
+TOKEN :
+{
+  < INTEGER_LITERAL: ["0"-"9"] (["0"-"9"])* >
+|
+  < STRING_LITERAL:
+      "\""
+      (   (~["\"","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )*
+      "\""
+  >
+
+}
+
+/* IDENTIFICADORES */
+
+TOKEN :
+{
+  < IDENTIFIER: ["a"-"z","A"-"Z","_","?","?"] ( ["a"-"z","A"-"Z","0"-"9","_","?","?"] )* >
+}
+
+
+/* SEPARADORES */
+
+TOKEN :
+{
+  < LPAREN: "(" >
+| < RPAREN: ")" >
+| < LBRACE: "{" >
+| < RBRACE: "}" >
+| < SEMICOLON: ";" >
+| < COLON: ":" >
+| < COMMA: "," >
+| < DOT: "." >
+}
+
+/* OPERATORS */
+
+TOKEN :
+{
+  < ASSIGN: ":=" >
+| < EQ: "=" >
+| < LE: "<=" >
+| < GT: ">" >
+| < LT: "<" >
+| < GE: ">=" >
+| < NE: "<>" >
+| < OR: "|" >
+| < AND: "&" >
+| < NOT: "!" >
+| < PLUS: "+" >
+| < MINUS: "-" >
+| < PROD: "*" >
+| < DIV: "/" >
+| < MOD: "%" >
+}
+
+//*****************************************************//
+//*****************************************************//
+
+//***********************//
+SimpleNode Compilar(): {}
+{
+
+  < PROGRAM > <IDENTIFIER> 
+  Declaraciones()
+  Cuerpo()
+  < EOF >
+  { return jjtThis; }
+	
+}
+//**********************//
+void Declaraciones() #void: {}
+{
+  
+  [Variables()]
+  [subprogramas()]
+  [Hilos()]
+  
+  //Seteamos el ambito global
+  {setDefinicion(0);setAmbito("");}
+  [Variables()]
+  
+  
+}
+
+//**************//
+void Cuerpo() #void: {}
+{
+  < BEGIN >
+  (Sentencia())*
+  < END >
+}
+
+//***************//
+void Hilos() #void: {}
+{
+  < THREADS >{setDefinicion(THREADS);}
+  (DefinicionHilo())+
+}
+
+//************************//
+void DefinicionHilo() #DefinicionHilo:
+{Token identificador;
+}
+{
+ 
+ (
+    < THREAD > identificador=< IDENTIFIER >
+    				{
+    				 insertarHilo(identificador);
+    				 //seteamos el ambito para q cuando se definan variables o se usen sean del ambito del hilo
+    				 setAmbito(identificador.image);
+    				}
+    				[<LPAREN > ParametrosFormalesHilo() < RPAREN >]
+  [Variables()]
+  Cuerpo()
+
+  {
+    //Nombre del hilo
+    jjtThis.nombre=identificador.image;
+  }
+)
+}
+
+//************************//
+void ParametrosFormalesHilo() #ParametrosFormalesHilo:{}
+{ 
+   ( ParametroFormalEntradaHilo()
+     ( < SEMICOLON > ParametroFormalEntradaHilo())*
+   )
+}
+
+
+//********************************************//
+void ParametroFormalEntradaHilo() #ParametroFormalEntradaHilo:
+{Token identificador;
+ int tipo;}
+{
+  < INPUT > identificador=< IDENTIFIER > < COLON > tipo=TipoPrimitivo()
+  {
+    //insertamos el identificador y el tipo
+    insertarIdentificador(identificador,tipo);
+
+    //agregamos al padre el parametro
+    agregarParametroHilo(identificador,tipo);
+
+	//guardamos los datos del identificador
+    jjtThis.nombre=identificador.image;
+    jjtThis.tipo=tipo;
+  }
+}
+
+
+
+
+//***************//
+void subprogramas() #void: {}
+{
+  < SUBPROGRAM >{setDefinicion(SUBPROGRAM);}
+  (DefinicionProcedimiento()
+    | 
+   DefinicionFuncion())+
+}
+
+//************************//
+void DefinicionProcedimiento() #DefinicionProcedimiento:
+{Token identificador;
+}
+{
+ 
+ (
+    < PROCEDURE > identificador=< IDENTIFIER >
+    				{
+    				 //String nombreProcedimiento=t.image;
+    				 insertarSubprograma(identificador);
+    				 //seteamos el ambito para q cuando se definan variables o se usen sean del ambito del procedimiento
+    				 setAmbito(identificador.image);
+    				}
+    				[<LPAREN > ParametrosFormales() < RPAREN >] 
+  [Variables()]
+  Cuerpo()
+
+  {
+    jjtThis.nombre=identificador.image;
+  }
+)
+   
+}
+
+void DefinicionFuncion() #DefinicionFuncion:
+{Token identificador;
+int tipoF,tipoE;
+}
+{
+ (
+    < FUNCTION > identificador=< IDENTIFIER >
+    				{
+    				 //
+    				 insertarSubprograma(identificador);
+    				 //seteamos el ambito para q cuando se definan variables o se usen sean del ambito de la funcion
+    				 setAmbito(identificador.image);
+    				}
+    				[<LPAREN > ParametrosFormales() < RPAREN >] < COLON > tipoF = TipoPrimitivo()
+                                {
+                                 insertarTipoFuncion(identificador,tipoF);
+                                }
+        
+        //variables de la nueva funcion
+        [Variables()]
+
+        //nuevo cuerpo() de la funcion
+        < BEGIN >
+            (Sentencia())*
+            < RETURN > 
+                //
+                tipoE=Expresion() #FuncionUsuarioRetorno()
+                {
+                verificarTipos(token,tipoF,tipoE);
+                }
+        < END >
+
+  {
+    jjtThis.nombre=identificador.image;
+  }
+ ) 
+}
+//************************//
+void ParametrosFormales() #ParametrosFormales:{}
+{ 
+   ( ParametroFormal()
+     ( < SEMICOLON > ParametroFormal())*
+   )
+}
+
+//*********************//
+void ParametroFormal() #void:{}
+{
+  ParametroFormalEntrada()
+	| ParametroFormalSalida()
+	| ParametroFormalEntradaSalida()
+  
+}
+
+//********************************************//
+void ParametroFormalEntrada() #ParametroFormalEntrada:
+{Token identificador;
+ int tipo;}
+{
+  < INPUT > identificador=< IDENTIFIER > < COLON > tipo=TipoPrimitivo()
+  {
+    //insertamos el identificador y el tipo
+    insertarIdentificador(identificador,tipo);
+
+    //agregamos al padre el parametro
+    agregarParametroProcedimiento(identificador,tipo,INPUT);
+
+	//guardamos los datos del identificador
+    jjtThis.nombre=identificador.image;
+    jjtThis.tipo=tipo;
+  }
+}
+
+//*******************************************//
+void ParametroFormalSalida() #ParametroFormalSalida:
+{Token identificador;
+ int tipo;}
+{
+  < OUTPUT > identificador=< IDENTIFIER > < COLON > tipo=TipoPrimitivo()
+  {
+    //insertamos el identificador y el tipo
+    insertarIdentificador(identificador,tipo);
+    
+    //agregamos al padre el parametro
+    agregarParametroProcedimiento(identificador,tipo,OUTPUT);
+
+	//guardamos los datos del identificador
+    jjtThis.nombre=identificador.image;
+    jjtThis.tipo=tipo;
+  }
+}
+
+//**************************************************//
+void ParametroFormalEntradaSalida() #ParametroFormalEntradaSalida:
+{Token identificador;
+ int tipo;}
+{
+  < INPUTOUTPUT > identificador=< IDENTIFIER > < COLON > tipo=TipoPrimitivo()
+  {
+    //insertamos el identificador y el tipo
+    insertarIdentificador(identificador,tipo);
+
+    //agregamos al padre el parametro
+    agregarParametroProcedimiento(identificador,tipo,INPUTOUTPUT);
+
+	//guardamos los datos del identificador
+    jjtThis.nombre=identificador.image;
+    jjtThis.tipo=tipo;
+  }
+}
+
+//***************//
+void Variables() #void:{}
+{
+  < VAR >
+  (DefinicionVariable())+ 
+}
+
+//************************//
+void DefinicionVariable():
+{ Token identificador; int tipo;}
+{
+  identificador = <IDENTIFIER>
+  		{
+  		  jjtThis.setNombre(identificador.image);
+  		}
+      < COLON >
+      tipo = TipoPrimitivo()
+      {
+        insertarIdentificador(identificador,tipo);
+        jjtThis.tipo=tipo;
+      }
+      
+}
+
+int TipoPrimitivo() #void:
+{}
+{
+	(
+  		  < INTEGER > 
+		| < BOOLEAN >
+		| < STRING >
+		| < SEMAPHORE_BINARY >
+		| < SEMAPHORE_GENERAL >
+     )
+     {
+       return token.kind;
+     }
+      
+}
+//***************//
+void Sentencia() #void:{}
+{
+    
+  (
+    Primitiva()
+   |SentenciaSimple()
+   |SentenciaCompuesta()
+  )
+  
+}
+
+//***************//
+void Primitiva() #void:{}
+{
+ 
+  < START > 	 #Pri_Iniciar
+| < MOVE > 		 #Pri_Mover
+| < RIGHT >		 #Pri_Derecha
+| < TAKEFLOWOR > #Pri_TomarFlor
+| < TAKEPAPER >  #Pri_TomarPapel
+| < PUTFLOWER >  #Pri_DepositarFlor
+| < PUTPAPER >   #Pri_DepositarPapel
+}
+
+//*********************//
+void SentenciaSimple() #void:{}
+{
+  LOOKAHEAD(2)
+  Asignacion()
+| Invocacion()
+}
+
+//****************//
+void Asignacion() #Asignacion(2):
+{int tipoI,tipoE;}
+{
+  tipoI=Identificador() <ASSIGN> tipoE=Expresion()
+  {verificarTipos(token,tipoI,tipoE);}
+}
+
+//*******************//
+int Identificador():
+{Token identificador;}
+{
+  identificador= < IDENTIFIER >
+  	{
+  	  //verificamos que exista
+  	  verificarIdentificador(identificador);
+
+	  //guardamos el nombre del identificador
+  	  jjtThis.setNombre(identificador.image);
+
+  	  //retornamos el tipo del identificador
+  	  return obtenerTipo(identificador);
+  	}
+}
+
+int FuncionUsuario() #FuncionUsuario:
+{Token identificador;int tipo;int orden=0;int kind;}
+
+{
+            identificador = < IDENTIFIER >
+                    {              
+                    //verificamos que exista
+                    verificarSubprograma(identificador);
+                    }
+
+            < LPAREN >
+                   //IdentificadorOExpresion(nombre,orden++)
+                [   (LOOKAHEAD(Identificador()(< COMMA >|< RPAREN >))
+                                     tipo=Identificador()
+                                    {
+                                      kind=OUTPUT;
+                                      jjtThis.addNombreParametrosReales(token.image);
+                                    }
+                            |tipo=Expresion()
+                                            {
+                                              kind=INPUT;
+                                              jjtThis.addNombreParametrosReales(null);
+                                            }
+                    ){verificarParametroSubprograma(identificador,tipo,kind,orden++);}
+                    (< COMMA > 
+                        (LOOKAHEAD(Identificador()(< COMMA >|< RPAREN >))
+                                     tipo=Identificador()
+                                    {
+                                      kind=OUTPUT;
+                                      jjtThis.addNombreParametrosReales(token.image);
+                                    }
+                            |tipo=Expresion()
+                                            {
+                                              kind=INPUT;
+                                              jjtThis.addNombreParametrosReales(null);
+                                            }
+                        ){verificarParametroSubprograma(identificador,tipo,kind,orden++);} 
+                    )*
+                ]
+            < RPAREN >
+            {
+              //como los parametros son opcionales en la definicion es necesario reconocer la cantidad
+              verificarCantidadParametrosSubprograma(identificador, orden);
+
+              //nombre del procedimiento
+              jjtThis.setNombre(identificador.image);       
+
+              return obtenerTipoFuncion(identificador);
+            }
+ 
+}
+
+
+//***************//
+int Expresion() #Expresion:
+{int tipo;
+ int tipoRela;
+ int operador;}
+{
+ (
+    tipo=ExpresionSimple()
+    [ operador=OperadorRelacional() tipoRela=ExpresionSimple() #OperacionRel(3)
+      {
+        verificarTipos(token,tipo,tipoRela,operador);
+        tipo=BOOLEAN;
+      }
+    ]
+ )
+ {return tipo;} 
+}
+
+//*********************//
+int ExpresionSimple()#void:
+{int tipo;
+ int tipoSum;
+ int operador;}
+{
+  (
+      ( tipo=SignoTermino() |tipo=Termino())
+      ( operador=OperadorAditivo() tipoSum=Termino() #OperacionSum(3){verificarTipos(token,tipo,tipoSum,operador);})*
+  ){return tipo;}
+}
+
+//*************//
+int Termino() #void:
+{int tipo;
+ int tipoMult;
+ int operador;}
+{
+  tipo=Factor()
+  (operador=OperadorMultiplicativo() tipoMult=Factor()#OperacionMul(3){verificarTipos(token,tipo,tipoMult,operador);})*
+  {return tipo;}
+}
+
+//******************//
+int Factor() #void:
+{int tipo;}
+{
+	(
+        (LOOKAHEAD(2)
+           tipo=FuncionUsuario()
+        |
+           tipo=Identificador())
+ 	| tipo=Constante()
+	| tipo=VariablePrimitiva()
+	| tipo=FuncionPrimitiva()  //por ej. --> n := aleatorio(10)
+        | < LPAREN > tipo=Expresion() < RPAREN >
+	|( < NOT > tipo=Factor() #OperacionNeg )
+	)
+	{return tipo;}
+}
+//*****************************//
+
+int FuncionPrimitiva() #void:
+{int tipo;}
+{
+  (
+    tipo=Aleatorio()
+  | tipo=Longitud()
+  | tipo=Sustraer() 
+  | tipo=NumeroATexto()
+  | tipo=TextoANumero()
+  | tipo=LogicoATexto()
+  | tipo=HayRobot()
+  | tipo=Minuscula()
+  | tipo=Mayuscula()
+  | tipo=Cortar()
+  | tipo=Reemplazar()
+  | tipo=Comienzacon()
+  | tipo=Terminacon()
+  | tipo=Indicede()
+  | tipo=Raiz()
+  | tipo=Potencia()
+  | tipo=MayorValor()
+  | tipo=Seno()
+  | tipo=Coseno()
+  | tipo=Tangente()
+  | tipo=Logaritmo()
+  | tipo=LetraAleatoria()
+  )
+  {return tipo;}
+}
+
+//*****************************//
+int Aleatorio() #FunPri_Aleatorio:
+{int tipo;}
+{
+	< RANDOM >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+		< RPAREN >
+	{ return INTEGER;}
+}
+
+//*****************************//
+int Minuscula() #FunPri_Minuscula:
+{int tipo;}
+{
+	< LOWERCASE >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+		< RPAREN >
+	{ return STRING;}
+}
+
+//*****************************//
+int Mayuscula() #FunPri_Mayuscula:
+{int tipo;}
+{
+	< UPPERCASE >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+		< RPAREN >
+	{ return STRING;}
+}
+
+//*****************************//
+int Cortar() #FunPri_Cortar:
+{int tipo;}
+{
+	< TRIM >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+		< RPAREN >
+	{ return STRING;}
+}
+
+//*****************************//
+int Reemplazar() #FunPri_Reemplazar:
+{int tipo;}
+{
+	< REPLACE >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+ 			< COMMA >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+ 			< COMMA >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+		< RPAREN >
+	{ return STRING;}
+}
+
+//*****************************//
+int Comienzacon() #FunPri_Comienzacon:
+{int tipo;}
+{
+	< STARTSWITH >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+ 			< COMMA >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+		< RPAREN >
+	{ return BOOLEAN;}
+}
+
+//*****************************//
+int Terminacon() #FunPri_Terminacon:
+{int tipo;}
+{
+	< ENDSWITH >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+ 			< COMMA >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+		< RPAREN >
+	{ return BOOLEAN;}
+}
+
+//*****************************//
+int Indicede() #FunPri_Indicede:
+{int tipo;}
+{
+	< INDEXOF >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+ 			< COMMA >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+		< RPAREN >
+	{ return INTEGER;}
+}
+
+int Raiz() #FunPri_Raiz:
+{int tipo;}
+{
+	< SQRT >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+		< RPAREN >
+	{ return INTEGER;}
+}
+
+int Potencia() #FunPri_Potencia:
+{int tipo;}
+{
+	< POW >
+                < LPAREN > 
+                    tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+                    < COMMA >
+                    tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+                <RPAREN >
+	{ return INTEGER;}
+}
+
+int MayorValor() #FunPri_MayorValor:
+{int tipo;}
+{
+	< MAX >
+                < LPAREN > 
+                    tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+                    < COMMA >
+                    tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+                <RPAREN >
+	{ return INTEGER;}
+}
+
+int Seno() #FunPri_Seno:
+{int tipo;}
+{
+	< SIN >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+		< RPAREN >
+	{ return INTEGER;}
+}
+
+int Coseno() #FunPri_Coseno:
+{int tipo;}
+{
+	< COS >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+		< RPAREN >
+	{ return INTEGER;}
+}
+
+int Tangente() #FunPri_Tangente:
+{int tipo;}
+{
+	< TAN >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+		< RPAREN >
+	{ return INTEGER;}
+}
+
+int Logaritmo() #FunPri_Logaritmo:
+{int tipo;}
+{
+	< LOG >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+		< RPAREN >
+	{ return INTEGER;}
+}
+
+int LetraAleatoria() #FunPri_LetraAleatoria:
+{int tipo;}
+{
+	< RANDOMLET >
+		< LPAREN >
+		< RPAREN >
+	{ return STRING;}
+}
+
+
+//*****************************//
+int Longitud() #FunPri_Longitud:
+{int tipo;}
+{
+	< LENGTH >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+		< RPAREN >
+	{ return INTEGER;}
+}
+
+//*****************************//
+int Sustraer() #FunPri_Sustraer:
+{int tipo;}
+{
+	< SUBSTRING >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+ 			< COMMA >
+ 			tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+ 			< COMMA >
+ 			tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+		< RPAREN >
+	{ return STRING;}
+}
+
+//************************************//
+int NumeroATexto() #FunPri_NumeroATexto:
+{int tipo;}
+{
+	< NUMBERTOTEXT >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+		< RPAREN >
+	{ return STRING;}
+}
+
+//************************************//
+int TextoANumero() #FunPri_TextoANumero:
+{int tipo;}
+{
+	< TEXTTONUMBER >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,STRING);}
+		< RPAREN >
+	{ return INTEGER;}
+}
+
+//************************************//
+int LogicoATexto() #FunPri_LogicoATexto:
+{int tipo;}
+{
+	< LOGICTOTEXT >
+		< LPAREN >
+ 			tipo=Expresion() {verificarTipos(token,tipo,BOOLEAN);}
+		< RPAREN >
+	{ return STRING;}
+}
+
+//************************************//
+int HayRobot() #FunPri_HayRobot:
+{int tipo;}
+{
+	< HAYROBOT >
+		[< LPAREN >
+			tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+ 			< COMMA >
+ 			tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+ 		< RPAREN >]
+	{ return BOOLEAN;}
+}
+
+//***********************//
+int VariablePrimitiva() #Pri_Variable:
+{int tipo;}
+{
+ (
+	  < POSAV >			{tipo=INTEGER;}
+	| < POSCA >			{tipo=INTEGER;}
+	| < HAYFLORENLAESQUINA >	{tipo=BOOLEAN;}
+	| < HAYFLORENLABOLSA >		{tipo=BOOLEAN;}
+	| < HAYPAPELENLAESQUINA >	{tipo=BOOLEAN;}
+	| < HAYPAPELENLABOLSA > 	{tipo=BOOLEAN;}
+	| < HAYOBSTACULO > 		{tipo=BOOLEAN;}
+  )
+  {
+    jjtThis.nombre=token.image;
+   	return tipo;
+  }
+}
+
+//*********************//
+int OperadorAditivo():{}
+{
+  (
+      < PLUS > 
+	| < MINUS >
+	| < OR >   
+  )
+  {
+    jjtThis.operador = token.image;
+    return token.kind;
+  }
+}
+
+//****************************//
+int OperadorMultiplicativo():{}
+{
+  (
+      < PROD >  
+	| < DIV >  
+	| < AND >
+	| < MOD >
+  )
+  {
+   	jjtThis.operador = token.image;
+	return token.kind;
+  }
+}
+
+//************************//
+int OperadorRelacional():{}
+{
+  (
+      < EQ > 
+	| < LE > 
+	| < GT > 
+	| < LT > 
+	| < GE > 
+	| < NE > 
+  )
+  {
+    jjtThis.operador = token.image;
+    return token.kind;
+  }
+}
+
+//***********//
+int SignoTermino() #SignoTermino:
+{Token t;
+int tipo;}
+{
+ (
+   (t=< PLUS >|t=< MINUS >)
+ tipo=Termino()
+ )
+ {
+   jjtThis.signo = t.image;
+   return tipo;
+ }
+}
+
+
+
+//***************//
+int Constante() #void:
+{Token t;}
+{
+  (
+    t=< INTEGER_LITERAL >{jjtThis.valor= Integer.parseInt(t.image);return INTEGER;}
+  )#ConstanteInt
+| (
+    t=< STRING_LITERAL >{jjtThis.valor= t.image;return STRING;}
+  )#ConstanteStr
+| (
+    t= < TRUE > {return BOOLEAN;}
+  )#ConstanteBoolTrue
+| (
+    t= < FALSE > {return BOOLEAN;}
+  )#ConstanteBoolFalse
+  
+}
+
+//************************//
+void SentenciaCompuesta() #void:{}
+{
+  Seleccion()
+| IteracionCondicional()
+| IteracionIncondicional()  
+}
+
+//***************//
+void Seleccion():
+{int tipo;}
+{  
+  < IF >  tipo=Expresion(){verificarTipos(token,tipo,BOOLEAN);}
+    ( Bloque() )
+  [ LOOKAHEAD(1) < ELSE >
+  	( Bloque() )
+  ]
+}
+
+void Bloque():{}
+{
+  ( Sentencia()| Cuerpo() )
+}
+//**************************//
+void IteracionCondicional():
+{int tipo;}
+{
+  < WHILE > tipo=Expresion(){verificarTipos(token,tipo,BOOLEAN);}
+    ( Bloque() )
+}
+
+//****************************//
+void IteracionIncondicional():
+{int tipo;}
+{
+  < REPEAT >  tipo=Expresion(){verificarTipos(token,tipo,INTEGER);} 
+    ( Bloque() )
+}
+
+//****************//
+void Invocacion() #void:{}
+{
+ (LOOKAHEAD(2)
+   ProcedimientoUsuarioHilo()
+ | ProcedimientoUsuario() 
+ | ProcedimientoPrimitivo())
+}
+
+//------------------ algo similar deberia crearse el llamado a una funcion
+void ProcedimientoUsuario():
+{Token identificador;String nombre;int tipo;int orden=0;int kind;}
+{
+	identificador = < IDENTIFIER >
+		{
+		  verificarSubprograma(identificador);
+		}
+    
+    [ < LPAREN >
+               //IdentificadorOExpresion(nombre,orden++)
+               (LOOKAHEAD(Identificador()(< COMMA >|< RPAREN >))
+	 			 tipo=Identificador()
+        			{
+        			  kind=OUTPUT;
+        			  jjtThis.addNombreParametrosReales(token.image);
+        			}
+    			|tipo=Expresion()
+	  				{
+	  				  kind=INPUT;
+	  				  jjtThis.addNombreParametrosReales(null);
+	  				}
+    		   ){verificarParametroSubprograma(identificador,tipo,kind,orden++);}
+    		   
+               
+    (< COMMA > (LOOKAHEAD(Identificador()(< COMMA >|< RPAREN >))
+	 			 tipo=Identificador()
+        			{
+        			  kind=OUTPUT;
+        			  jjtThis.addNombreParametrosReales(token.image);
+        			}
+    			|tipo=Expresion()
+	  				{
+	  				  kind=INPUT;
+	  				  jjtThis.addNombreParametrosReales(null);
+	  				}
+    		   ){verificarParametroSubprograma(identificador,tipo,kind,orden++);} )*
+
+    <RPAREN >]
+    {
+	  //como los parametros son opcionales en la definicion es necesario reconocer la cantidad
+	  verificarCantidadParametrosSubprograma(identificador, orden);
+
+          //nombre del procedimiento
+          jjtThis.nombre=identificador.image;
+      
+    }
+}
+//******************//
+void ProcedimientoUsuarioHilo():
+{Token identificador;String nombre;int tipo;int orden=0;}
+{
+  	
+	<THREAD_START> identificador= < IDENTIFIER > 
+		{
+		  //nombre=t.image;
+		  verificarHilo(identificador);
+		}
+
+    
+    [ < LPAREN >
+               tipo=Expresion()
+	  			{
+	  			 // jjtThis.add(null);
+    		      verificarParametroHilo(identificador,tipo,orden++);
+    		    }
+               
+    (
+      < COMMA > tipo=Expresion()
+	  			{
+	  			  //jjtThis.add(null);
+    		   	  verificarParametroHilo(identificador,tipo,orden++);
+    		   	  }
+    )*
+
+    <RPAREN >]
+   
+    {
+	  //como los parametros son opcionales en la definicion es necesario reconocer la cantidad
+	  verificarCantidadParametrosHilo(identificador, orden);
+      //nombre del hilo/robot
+      jjtThis.nombre=identificador.image;
+      
+    }
+}
+
+//**********************//
+void ProcedimientoPrimitivo() #void:{}
+{
+  Informar()
+| Pos()
+| Leer()
+//Manejo de Semaforos
+| IniciarSemaforo()
+| Senal()
+| Esperar()
+}
+
+//***************//
+void Informar():{}
+{
+  <MESSAGE> < LPAREN > Expresion() (< COMMA > Expresion())* <RPAREN >
+}
+
+//**********//
+void Leer():
+{int tipo;}
+{
+  < READ >
+  < LPAREN >
+    tipo=Identificador() {verificarTipos(token,tipo,tipo,EQ);}
+  < RPAREN >
+}
+
+//*****************//
+void Pos() #Pri_Pos:
+{int tipo;}
+{
+ < POSITION >
+ 	< LPAREN >
+ 		tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+ 		< COMMA >
+ 		tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}
+ 	<RPAREN >
+}
+
+//****************************************//
+void IniciarSemaforo() #Pri_IniciarSemaforo:
+{int tipo;}
+{
+	< SEMAPHORE_INIT >
+	< LPAREN >
+		tipo=Identificador() {verificarTipos(token,tipo,SEMAPHORE);}
+		[< COMMA > tipo=Expresion() {verificarTipos(token,tipo,INTEGER);}]
+	< RPAREN >
+}
+
+
+
+//*********************//
+void Senal() #Pri_PS:
+{int tipo;}
+{
+	< SIGNAL >
+	< LPAREN >
+		tipo=Identificador() {verificarTipos(token,tipo,SEMAPHORE);}
+	< RPAREN >
+}
+
+//*********************//
+void Esperar() #Pri_PE:
+{int tipo;}
+{
+	< WAIT >
+	< LPAREN >
+		tipo=Identificador() {verificarTipos(token,tipo,SEMAPHORE);}
+	< RPAREN >
+}
+

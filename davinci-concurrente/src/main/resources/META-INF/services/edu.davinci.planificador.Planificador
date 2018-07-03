@@ -1,0 +1,3 @@
+edu.davinci.planificador.PlanificadorEsencialImpl
+edu.davinci.planificador.PlanificadorAleatorioImpl
+edu.davinci.planificador.PlanificadorRoundRobinImpl

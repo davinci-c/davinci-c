@@ -1,0 +1,197 @@
+programa ProductorConsumidor
+
+variables
+	lleno:semaforoGeneral
+	vacio:semaforoGeneral
+	turno:semaforoBinario
+	turno_cuadrante:semaforoBinario
+	avenida:numero
+	
+	//Constantes
+	AV_INICIAL : numero
+	AV_FINAL : numero
+       CALLE : numero
+	
+subprogramas
+
+	procedimiento tomarFlorDeCuadrante
+	variables
+		tengoFlor:logico
+		av:numero
+		ca:numero
+	comenzar
+		//marcamos que aun no obtuvimos una flor
+		tengoFlor := f
+
+		//ciclo que correra hasta obtener una flor
+		mientras ! tengoFlor
+			comenzar
+				
+				//obtenemos un numero aleatorio para la avenida
+				av:= aleatorio(10)+1 
+		
+				//obtenemos un numero aleatorio para la calle
+				ca:=aleatorio(10)+3
+
+				//posicionamos el robot
+				Pos(av,ca)
+				
+				//marcamos si en la posicion hay una flor
+				tengoFlor := HayFlorEnLaEsquina
+			fin
+
+			//tomamos la flor
+			tomarFlor
+	fin
+
+	procedimiento depositarFlorEnCuadrante
+	variables
+		av:numero
+		ca:numero
+	comenzar
+		
+		//obtenemos un numero aleatorio para la avenida
+		av:= aleatorio(10)+1 
+		
+		//obtenemos un numero aleatorio para la calle
+		ca:=aleatorio(10)+3
+
+		//posicionamos el robot
+		Pos(av,ca)
+
+		//depositamos la flor
+		depositarFlor
+	fin
+
+	procedimiento tomarFlorDeCalle(en av:numero; en ca:numero)
+	comenzar
+		
+		//posicionamos al robot
+		Pos(av,ca)
+
+		//tomamos una flor
+		tomarFlor
+
+		//
+		Informar("tome flor en la esquina ",av,",",ca)
+	fin
+
+	procedimiento depositarFlorEnCalle(en av:numero; en ca:numero)
+	comenzar
+		
+		//posicionamos el robot
+		Pos(av,ca)
+		
+		//depositamos una flor
+		depositarFlor
+
+		//
+		Informar("deposite flor en la esquina ",av,",",ca)
+	fin
+
+	procedimiento producir
+	comenzar
+	
+		//introducimos el robot en la ciudad
+		iniciar
+
+		mientras v
+			comenzar
+			
+			//esperamos el turno para obtener una flor del cuadrante
+			esperar(turno_cuadrante)
+
+			//tomamos la flor del cuadrante
+			tomarFlorDeCuadrante
+		
+			//señalamos el fin del turno
+			avisar(turno_cuadrante)
+
+			//sincronizamos con el resto de los productores, consumidores -  tambien evita superar los limites 
+			esperar(vacio)
+			
+				//esperamos el turno para trabajar en la calle
+				esperar(turno)
+				si (avenida = AV_FINAL)
+					avenida := AV_INICIAL
+				avenida := avenida + 1	
+				depositarFlorEnCalle(avenida,calle)
+				avisar(turno)
+			
+			//senalamos que se ha depositado un elemento
+			avisar(lleno)
+			fin	
+
+	fin
+
+	procedimiento consumir
+	comenzar
+		//introducimos el robot en la ciudad
+		iniciar
+
+		mientras v
+			comenzar
+
+			//sincronizamos con el resto de los productores, consumidores -  tambien evita superar los limites
+			esperar(lleno)
+			
+				esperar(turno)
+				si (avenida = AV_INICIAL)
+					avenida := AV_FINAL
+				tomarFlorDeCalle(avenida,calle)
+				avenida := avenida - 1
+				avisar(turno)
+
+			//senala que se tomo una flor de la calle
+			avisar(vacio)
+
+			//
+			depositarFlorEnCuadrante
+			fin
+	fin
+
+hilos
+	hilo productor1
+	comenzar
+		producir
+	fin
+
+	hilo productor2
+	comenzar
+		producir
+	fin
+
+	hilo consumidor1
+	comenzar
+		consumir
+	fin
+
+	hilo consumidor2
+	comenzar
+		consumir
+	fin
+
+comenzar
+	AV_INICIAL := 0
+	AV_FINAL := 10
+       CALLE := 2
+	
+	//controlamos que no se puedan tomar flores de la calle si no se han depositado
+	iniciarSemaforo(lleno,0)
+
+	//controlamos que no se puedan depositar mas flores que el limite 
+	iniciarSemaforo(vacio,AV_FINAL)
+
+	//controlamos el acceso al recurso 
+	iniciarSemaforo(turno,1)
+
+	//controlamos el acceso para obtener la flor del cuadrante
+	iniciarSemaforo(turno_cuadrante,1)
+
+	
+	//arrancamos los productores y consumidores
+	arrancar productor1
+	arrancar productor2
+	arrancar consumidor1
+	arrancar consumidor2
+fin

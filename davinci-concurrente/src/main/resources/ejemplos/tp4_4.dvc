@@ -1,0 +1,10 @@
+programa tp_4_4
+{
+Escriba un programa que le permita al robot recoger una flor de la
+esquina (54,71) que seguro existe.
+}
+comenzar
+	iniciar
+	Pos(54,71)
+	tomarFlor
+fin

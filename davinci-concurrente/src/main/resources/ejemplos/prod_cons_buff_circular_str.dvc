@@ -1,0 +1,66 @@
+programa ProductorConsumidor
+
+variables //globales
+	lleno:semaforoGeneral
+	vacio:semaforoGeneral
+	turno:semaforoBinario
+	buffer:texto
+	//Constantes
+	CANTIDAD_CARACTERES : numero
+  
+subprogramas
+
+	procedimiento producir(en cantCaracteres:numero)
+	comenzar
+		mientras v
+			comenzar
+			esperar(vacio)
+				esperar(turno)
+					buffer := buffer + "-"
+				avisar(turno)
+			avisar(lleno)
+			fin		
+	fin
+
+hilos
+	
+	hilo productor1 (en cantCaracteres:numero)
+	comenzar 
+		producir(cantCaracteres)
+	fin
+	
+  hilo productor2 (en cantCaracteres:numero)
+	comenzar 
+		producir(cantCaracteres)
+	fin
+	
+	hilo consumidor (en cantCaracteres:numero)
+	comenzar 
+		mientras v
+			comenzar
+			esperar(lleno)
+				esperar(turno)
+				buffer := sustraer(buffer,1,1)	
+				avisar(turno)
+			avisar(vacio)
+	  	
+			fin
+	fin
+
+comenzar
+ //constantes
+	CANTIDAD_CARACTERES := 20
+  
+	//recursos compartidos
+	buffer:=""
+
+	//inicilizacion semaforos
+	iniciarSemaforo(lleno,0)
+	iniciarSemaforo(vacio,CANTIDAD_CARACTERES)
+	iniciarSemaforo(turno,1)
+	
+	//arrancamos los hilos
+	arrancar productor1(CANTIDAD_CARACTERES)
+	arrancar productor2(CANTIDAD_CARACTERES)
+	arrancar consumidor(CANTIDAD_CARACTERES)
+fin

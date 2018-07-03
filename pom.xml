@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Proyecto -->    
+    <groupId>edu.davinci</groupId>
+    <artifactId>davinci-c</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>davinci-c</name>
+    <url>http://davinci-c.sourceforge.net</url>
+
+    <description>
+       DaVinci Concurrene
+    </description>
+    
+    <!-- Desarrolladores -->
+    <developers>
+        <developer>
+            <id>daniel.aguil</id>
+            <name>Aguill Mallea, Daniel Eugenio</name>
+            <email>danielaguilmallea@gmail.com</email>
+            <organization>Universidad de Tierra del Fuego</organization>
+            <roles>
+                <role>desarrollador</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>german.tejero</id>
+            <name>Tejero, Carlos German</name>
+            <email>german.tejero@gmail.com</email>
+            <organization>Universidad de Tierra del Fuego</organization>
+            <roles>
+                <role>desarrollador</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <!-- Personas que contribuyeron -->
+    <contributors>
+        <contributor>
+        </contributor>
+    </contributors>
+    
+    <!-- propiedades del proyecto-->
+    <properties>
+        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.6</java.version>
+    </properties>
+
+    <!-- Modulos -->
+    <modules>
+        <module>davinci-concurrente</module>
+        <module>davinci-concurrente-edi-editor-autocompletar</module>
+        <module>davinci-concurrente-edi-editor</module>
+        <module>davinci-concurrente-edi-simple</module>
+    <module>davinci-concurrente-edi-instalador</module>
+  </modules>
+
+    <!-- Control de versiones -->
+    <scm>
+        <connection>scm:svn:svn://svn.code.sf.net/p/davinci-c/code-0/trunk davinci-c-code-0</connection>
+        <developerConnection>scm:svn:svn+ssh://daniel.aguil@svn.code.sf.net/p/davinci-c/code-0/trunk davinci-c-code-0</developerConnection>
+        <url>scm:svn:svn://svn.code.sf.net/p/davinci-c/code-0/trunk davinci-c-code-0</url>
+    </scm>
+ 
+</project>

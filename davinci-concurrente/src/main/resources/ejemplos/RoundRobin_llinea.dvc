@@ -1,0 +1,27 @@
+programa PlanificadorRoundRobin
+variables
+	linea:numero
+subprogramas
+	procedimiento informa(en t:texto)
+	comenzar
+		linea:= linea + 1
+		informar("[",linea,"] ",t)
+	fin
+hilos
+	hilo T1
+	comenzar
+		mientras v
+			informa(" ---- T1 ----")
+	fin
+
+	hilo T2
+	comenzar
+		mientras v
+			informa(" ---- T2 ----")
+	fin
+
+comenzar
+	linea:=0
+	arrancar T1
+	arrancar T2
+fin

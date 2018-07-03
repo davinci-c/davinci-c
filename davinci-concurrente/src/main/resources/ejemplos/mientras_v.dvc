@@ -1,0 +1,4 @@
+programa a
+comenzar
+	mientras v informar(aleatorio(10))
+fin

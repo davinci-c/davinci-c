@@ -1,0 +1,23 @@
+programa manipulacion
+variables 
+	expresion : numero
+hilos
+	hilo robot1
+	comenzar
+		repetir 5
+			expresion := expresion + 1
+	fin
+
+	hilo robot2
+	comenzar
+		repetir 5
+			expresion := expresion + 1
+	fin
+
+      
+comenzar
+	expresion := 0
+	arrancar robot1
+	arrancar robot2
+	informar(expresion)
+fin

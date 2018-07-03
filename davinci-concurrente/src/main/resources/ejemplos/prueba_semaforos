@@ -1,0 +1,25 @@
+programa aaaañ
+variables
+	binario:semaforoBinario
+	general:semaforoGeneral
+comenzar
+	iniciarSemaforo(binario)
+	iniciarSemaforo(general)
+	iniciarSemaforo(binario,1)
+	iniciarSemaforo(general,1)
+	iniciarSemaforo(binario,0)
+	iniciarSemaforo(general,20)
+	
+	señalar(binario)
+	señalar(general)
+
+	señalar(binario)
+	señalar(general)
+
+	esperar(binario)
+	esperar(general)
+	
+	esperar(binario)
+	esperar(general)
+	
+fin

@@ -1,0 +1,26 @@
+programa carrera
+
+hilos
+	hilo robot1
+	comenzar
+		iniciar
+		derecha
+		repetir 9
+			mover
+		Informar("robot1 en ",PosAv,",",PosCa)
+	fin
+
+	hilo robot2
+	comenzar
+		iniciar
+		Pos(10,1)
+		derecha derecha derecha
+		repetir 9
+			mover
+		Informar("robot2 en ",PosAv,",",PosCa)
+	fin
+
+comenzar
+	arrancar robot1
+	arrancar robot2
+fin

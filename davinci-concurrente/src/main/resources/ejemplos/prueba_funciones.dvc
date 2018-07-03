@@ -1,0 +1,18 @@
+programa prueba
+variables
+	log:logico
+	num:numero
+	tex:texto
+comenzar
+	
+	informar(log," ",logicoATexto(log))
+	informar(num," ",numeroATexto(num))
+	
+	tex := "1234"
+	log := v
+	num := 1234
+
+	informar(log," ",logicoATexto(log))
+	informar(num," ",numeroATexto(num))
+	informar(tex," ",textoANumero(tex))
+fin

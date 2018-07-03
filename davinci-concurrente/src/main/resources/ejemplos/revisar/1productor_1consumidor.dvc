@@ -1,0 +1,77 @@
+programa ProductorConsumidor
+
+variables
+	lleno:semaforoGeneral
+	vacio:semaforoGeneral
+	turno:semaforoBinario
+
+
+
+hilos
+	hilo productor
+	comenzar
+		//introducimos el robot en la ciudad
+		iniciar
+
+		mientras v
+			comenzar
+			
+
+			//sincronizamos con el resto de los productores, consumidores -  tambien evita superar los limites 
+			esperar(vacio)
+			
+				//esperamos el turno para trabajar en la calle
+				esperar(turno)
+				informar("--> pro")
+				depositarFlor
+				informar("<-- pro")
+				
+				señalar(turno)
+			
+			//senalamos que se ha depositado un elemento
+			señalar(lleno)
+			fin	
+	
+	fin
+
+	
+	hilo consumidor
+	comenzar
+		//introducimos el robot en la ciudad
+		iniciar
+
+		mientras v
+			comenzar
+
+			//sincronizamos con el resto de los productores, consumidores -  tambien evita superar los limites
+			esperar(lleno)
+			
+				esperar(turno)
+				informar("--> con")
+				tomarFlor
+				informar("<-- con")
+				señalar(turno)
+
+			//senala que se tomo una flor de la calle
+			señalar(vacio)
+
+			fin
+	fin
+
+comenzar
+	
+	//controlamos que no se puedan tomar flores de la calle si no se han depositado
+	iniciarSemaforo(lleno,0)
+
+	//controlamos que no se puedan depositar mas flores que el limite 
+	iniciarSemaforo(vacio,1)
+
+	//controlamos el acceso al recurso 
+	iniciarSemaforo(turno,1)
+
+
+	//arrancamos los productores y consumidores
+	arrancar productor
+
+	arrancar consumidor
+fin

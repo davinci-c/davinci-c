@@ -1,0 +1,25 @@
+programa carrera
+
+hilos
+	hilo robot1
+	comenzar
+		iniciar 
+		repetir 5
+			mover
+		informar("fin robot 1")
+	fin
+
+	hilo robot2
+	comenzar
+		iniciar
+		pos(2,1)
+		repetir 5
+			mover
+		informar("fin robot 2")
+	fin
+
+comenzar
+	Informar("arrancando robots")
+	arrancar robot1
+	arrancar robot2
+fin

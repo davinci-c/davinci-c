@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <!-- Proyecto padre -->  
+  <parent>
+     <groupId>edu.davinci</groupId>
+     <artifactId>davinci-c</artifactId>
+     <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Proyecto -->
+  <groupId>edu.davinci</groupId>
+  <artifactId>davinci-concurrente-edi-editor-autocompletar</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>davinci-concurrente-edi-editor-autocompletar</name>
+
+  <!-- Propiedades -->
+  <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>        
+      <davinci.version>1.0-SNAPSHOT</davinci.version>
+  </properties>
+
+  <!-- Dependencias -->
+  <dependencies>
+
+    <dependency>
+        <groupId>edu.davinci</groupId>
+        <artifactId>davinci-concurrente-edi-editor</artifactId>
+        <version>${davinci.version}</version>
+        <scope>compile</scope>
+    </dependency>
+
+  </dependencies>
+</project>

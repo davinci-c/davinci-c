@@ -1,0 +1,81 @@
+programa hayRobots
+variables
+	turno:semaforoBinario
+subprogramas
+	procedimiento obtenerSiguientes(es caSig:numero; es avSig:numero)
+	comenzar
+		si(caSig=1)
+			comenzar
+			caSig := 0
+			avSig := 1
+			fin
+		sino si (caSig = 0)&(avSig=1)
+			comenzar
+			caSig := -1
+			avSig := 0
+			fin
+		sino si (caSig = -1)
+			comenzar
+			caSig := 0
+			avSig := -1
+			fin
+		sino si (caSig = 0 )&(avSig=-1)
+			comenzar
+			caSig := 1
+			avSig := 0
+			fin
+	fin
+	procedimiento tarea(en av:numero; en ca:numero ; en largo:numero)
+	variables
+		avSig:numero
+		caSig:numero
+		avance : logico
+	comenzar
+		iniciar
+		Pos(av,ca)
+		caSig := 1
+		avSig := 0
+		mientras v
+			comenzar
+			repetir largo
+				comenzar
+				avance := f
+				mientras !avance
+					comenzar
+					esperar(turno)
+				
+					si hayRobot(posAv+avSig,posCa+caSig)
+					  informar("No puedo avanzar aun...")
+					sino
+						comenzar
+						mover
+						avance := v
+						fin
+					avisar(turno)
+					fin
+				fin
+			derecha
+			obtenerSiguientes(caSig, avSig)
+			fin
+	fin
+hilos
+	hilo robot1
+	comenzar
+		tarea(3,3, 5)
+	fin
+
+	hilo robot2
+	comenzar
+		tarea(2,2,5)
+	fin
+
+       hilo robot3
+	comenzar
+		tarea(1,1, 5)
+	fin
+comenzar
+	iniciarSemaforo(turno,1)
+	arrancar robot1
+	arrancar robot3
+	arrancar robot2
+fin

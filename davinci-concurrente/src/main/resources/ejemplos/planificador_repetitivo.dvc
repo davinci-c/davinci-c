@@ -1,0 +1,36 @@
+programa repetitivo
+variables 
+	valor : numero
+hilos
+	hilo robot1
+	comenzar
+		iniciar
+		pos(1,5)
+		derecha
+		repetir 9
+		  comenzar
+		  mover 
+		  si(HayFlorEnLaEsquina)
+		    tomarFlor
+		  fin 
+	fin
+
+	hilo robot2
+	comenzar
+		iniciar
+		pos(10,5)
+		derecha derecha derecha
+		repetir 9
+		  comenzar
+		  mover 
+		  si(HayFlorEnLaEsquina)
+		    tomarFlor
+		  fin
+	fin
+
+      
+comenzar
+	arrancar robot1
+	arrancar robot2
+	informar(valor)
+fin

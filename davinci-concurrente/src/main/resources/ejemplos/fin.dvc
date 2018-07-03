@@ -1,0 +1,73 @@
+programa tres_cuadrados
+subprogramas
+	procedimiento tarea(en av:numero; en ca:numero ; en largo:numero)
+	comenzar
+		iniciar
+		Pos(av,ca)
+		mientras v
+			comenzar
+			repetir largo
+				comenzar
+				{
+				//comentario
+				si(hayFlorEnLaEsquina)
+					tomarFlor	
+				si(hayPapelEnLaEsquina)
+					tomarPapel
+				}
+				mover
+				fin
+			derecha
+			fin
+	fin
+hilos
+	hilo letra_f
+	comenzar
+		iniciar 
+		pos(2,2)
+		repetir 4
+			mover
+		derecha
+		repetir 2
+			mover
+		pos(2,4)
+		mover
+		pos(5,5)
+	fin
+
+	hilo letra_i
+	comenzar
+		iniciar
+		pos(5,2)
+		repetir 2
+			mover
+		pos(5,5)
+		
+	fin
+
+       hilo letra_n
+	comenzar
+		iniciar
+		pos(7,2)
+		repetir 3
+			mover
+		pos(7,4)
+		derecha
+		mover
+		derecha
+		mover
+		repetir 3
+			derecha
+		mover
+		derecha
+		pos(9,5)
+		repetir 3
+	 	  mover
+		pos(5,5)
+	fin
+comenzar
+	Informar("arrancando robots...")
+	arrancar letra_f
+	arrancar letra_i
+	arrancar letra_n
+fin

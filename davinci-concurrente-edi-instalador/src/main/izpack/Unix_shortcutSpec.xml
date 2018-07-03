@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shortcuts>
+        
+    <programGroup defaultName="$APP_NAME" location="applications"/>
+
+    <shortcut
+        name="$APP_NAME $APP_VER"
+        target="/usr/bin/java"
+        commandLine="-jar $INSTALL_PATH/davinci-concurrente-edi-simple.jar"
+        description="$APP_NAME EDI $APP_VER"
+        iconFile="$INSTALL_PATH/icono.png"
+        workingDirectory="$INSTALL_PATH"
+        initialState="normal"
+        programGroup="yes"
+        desktop="yes"
+        applications="no"
+        startMenu="yes"
+        startup="no"
+        type="Application"
+        terminal="false"
+        encoding="UTF-8">
+
+        <createForPack name="Programa"/>
+    </shortcut>
+    
+    <shortcut
+        name="Desinstalador $APP_NAME $APP_VER"
+        target="/usr/bin/java"
+        commandLine="-jar $INSTALL_PATH/Uninstaller/uninstaller.jar"
+        description="Desinstalador de $APP_NAME EDI $APP_VER"
+        iconFile="$INSTALL_PATH/desinstalar.png"
+        initialState="normal"
+        programGroup="yes"
+        desktop="yes"
+        applications="no"
+        startMenu="yes"
+        startup="no"
+        type="Application"
+        terminal="false"
+        encoding="UTF-8">
+
+        <createForPack name="Programa"/>
+    </shortcut>
+</shortcuts>

@@ -1,0 +1,35 @@
+programa tres_cuadrados
+subprogramas
+	procedimiento correr(en av:numero)
+	comenzar
+		iniciar
+		pos(av,1)
+		mientras v
+		  comenzar
+				repetir (10-av)
+					mover
+				derecha
+			fin
+		informar(av)
+	fin
+hilos
+	hilo robot1
+	comenzar
+		correr(1)
+	fin
+
+	hilo robot2
+	comenzar
+		correr(2)
+	fin
+
+       hilo robot3
+	comenzar
+		correr(3)
+	fin
+comenzar
+	Informar("arrancando robots...")
+	arrancar robot1
+	arrancar robot2
+	arrancar robot3
+fin

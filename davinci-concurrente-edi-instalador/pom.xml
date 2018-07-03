@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  
+    <!-- Proyecto padre -->  
+    <parent>
+       <groupId>edu.davinci</groupId>
+       <artifactId>davinci-c</artifactId>
+       <version>1.0-SNAPSHOT</version>
+    </parent>
+    
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>edu.davinci</groupId>
+    <artifactId>davinci-concurrente-edi-instalador</artifactId>
+    <version>1.2.1</version>
+    <packaging>pom</packaging>
+  
+    <name>davinci-concurrente-edi-instalador</name>
+    <url>davinci-c.sourceforge.net</url>
+  
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <davinci.version>1.0-SNAPSHOT</davinci.version>
+    </properties> 
+  
+    <dependencies>
+        <dependency>
+            <groupId>edu.davinci</groupId>
+            <artifactId>davinci-concurrente</artifactId>
+            <version>${davinci.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>edu.davinci</groupId>
+            <artifactId>davinci-concurrente-edi-editor</artifactId>
+            <version>${davinci.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>edu.davinci</groupId>
+            <artifactId>davinci-concurrente-edi-editor-autocompletar</artifactId>
+            <version>${davinci.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>edu.davinci</groupId>
+            <artifactId>davinci-concurrente-edi-simple</artifactId>
+            <version>${davinci.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.swinglabs</groupId>
+            <artifactId>swing-layout</artifactId>
+            <version>1.0.3</version>            
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+                        
+            <!-- copia de dependencias -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-dependency-plugin</artifactId>
+              <executions>
+                <execution>
+                  <phase>process-resources</phase>
+                  <goals>
+                    <goal>copy-dependencies</goal>
+                  </goals>
+                  <configuration>
+                    <outputDirectory>${basedir}/target/staging</outputDirectory>
+                  </configuration>
+                </execution>            
+              </executions>
+            </plugin> 
+            
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                  <execution>
+                    <id>create-staging-area</id>
+                    <phase>process-resources</phase>
+                    <goals>
+                      <goal>run</goal>
+                    </goals>
+                    <configuration>
+                      <tasks>
+                        <copy todir="${basedir}/target/staging"> 
+                            <fileset dir="${basedir}/src/main/izpack"/>
+                        </copy>
+                      </tasks>
+                    </configuration>
+                  </execution>
+                </executions>
+              </plugin>
+            
+            <plugin>
+                <groupId>org.codehaus.izpack</groupId>
+                <artifactId>izpack-maven-plugin</artifactId>
+                <version>5.0.0-rc2</version>
+                <executions>
+                  <execution>
+                    <phase>package</phase>
+                    <goals>
+                      <goal>izpack</goal>
+                    </goals>
+                    <configuration>
+                        <baseDir>${basedir}/target/staging</baseDir>
+                        <installFile>${basedir}/target/staging/install.xml</installFile>
+                        <finalName>DaVinciConcurrente-${project.version}-Instalador</finalName>
+                        <autoIncludeUrl>true</autoIncludeUrl>
+                        <autoIncludeDevelopers>true</autoIncludeDevelopers>
+                    </configuration>
+                  </execution>
+                </executions>
+              </plugin>
+        </plugins>
+    </build>
+</project>

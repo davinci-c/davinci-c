@@ -1,0 +1,22 @@
+programa tres_cuadrados
+variables
+	largo:numero
+comenzar
+	iniciar
+	largo:=9
+	repetir 5 comenzar
+		repetir	4
+			comenzar
+			repetir largo
+				comenzar
+				mientras(hayFlorEnLaEsquina)
+					tomarFlor
+			 	mover
+			 	fin
+			derecha
+			
+			fin  
+			largo := largo - 2 
+			pos(posAv +1 , posca+1)
+	fin
+fin

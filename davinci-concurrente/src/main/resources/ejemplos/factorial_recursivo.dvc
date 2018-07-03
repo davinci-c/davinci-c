@@ -1,0 +1,23 @@
+programa factorial_recursivo_
+
+subprogramas
+
+	procedimiento factorial(en x:numero; es resultado:numero)
+	comenzar
+		si(x>=1)
+			comenzar
+			informar("x = ",x)
+		  resultado := resultado * x
+      factorial(x-1,resultado)
+      fin
+		
+	fin
+
+variables
+	fact:numero
+comenzar
+	fact := 1
+	factorial(5,fact)
+	informar("El factorial de 5 es: ",fact)
+fin
+		

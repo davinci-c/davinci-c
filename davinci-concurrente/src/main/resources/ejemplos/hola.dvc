@@ -1,0 +1,8 @@
+programa hola
+
+//programa principal
+comenzar
+  
+	informar("hola mundo...")
+
+fin

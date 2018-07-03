@@ -1,0 +1,24 @@
+programa tp_4_7
+{
+Escriba un programa que le permita al robot recorrer la avenida 10,
+depositando una flor en cada esquina. Si en algún momento del
+recorrido se queda sin flores en la bolsa, debe seguir caminando (sin
+depositar) hasta terminar la avenida.
+}
+comenzar
+	iniciar
+	Pos(10,1)
+	mientras(HayFlorEnLaBolsa) & (PosCa<=9)
+		comenzar
+		depositarFlor
+		mover
+		fin
+	si(posCa=10)
+		comenzar
+		si(hayflorenlabolsa)
+			depositarFlor
+		fin
+	sino
+		mientras(posCa  <= 9)
+			mover
+fin

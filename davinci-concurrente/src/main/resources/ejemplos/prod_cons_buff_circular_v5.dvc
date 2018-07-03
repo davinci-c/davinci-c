@@ -1,0 +1,85 @@
+programa ProductorConsumidor
+
+variables //globales
+	lleno:semaforoGeneral
+	vacio:semaforoGeneral
+	turno:semaforoBinario
+	turno_cuadrante:semaforoBinario
+	avenida_prod:numero
+	avenida_cons:numero
+	
+	//Constantes
+	AV_FINAL : numero
+  CALLE_CONS : numero
+	CALLE_PROD : numero
+	
+subprogramas
+
+	procedimiento tomarFlorDeCuadrante(en calle:numero; en av_fin:numero)
+	comenzar
+		Pos(1,calle)
+		mientras ! HayFlorEnLaEsquina
+			Pos((posAv % av_fin)+1,posCa)
+		tomarFlor
+	fin
+
+hilos
+	hilo productor (en ca_pro:numero;
+									en ca_con:numero;
+									en av_fin:numero)
+	comenzar 
+		iniciar 
+		mientras v
+			comenzar
+			esperar(turno_cuadrante)
+				tomarFlorDeCuadrante(ca_pro, av_fin)
+			avisar(turno_cuadrante)
+			esperar(vacio)
+				esperar(turno)
+					Pos(avenida_prod,ca_con)
+					depositarFlor
+					avenida_prod := (avenida_prod % av_fin)+ 1	
+				avisar(turno)
+			avisar(lleno)
+			fin		
+	fin
+
+	hilo consumidor (en ca_pro:numero;
+									 en ca_con:numero;
+									 en av_fin:numero)
+	comenzar 
+		iniciar 
+		mientras v
+			comenzar
+			esperar(lleno)
+				esperar(turno)
+					Pos(avenida_cons,ca_con)
+					tomarFlor
+					avenida_cons := (avenida_cons % av_fin)+ 1	
+				avisar(turno)
+			avisar(vacio)
+	  	Pos(aleatorio(av_fin)+1,ca_pro)
+			depositarFlor
+			fin
+	fin
+
+comenzar
+	//constantes
+	AV_FINAL := 10
+  CALLE_CONS := 2 
+  CALLE_PROD := 8
+	
+	//recursos compartidos
+	avenida_prod := 1
+	avenida_cons := 1
+
+	//inicilizacion semaforos
+	iniciarSemaforo(lleno,0)
+	iniciarSemaforo(vacio,AV_FINAL)
+	iniciarSemaforo(turno,1)
+	iniciarSemaforo(turno_cuadrante,1)
+
+	//arrancamos los hilos
+	arrancar  productor(CALLE_PROD, CALLE_CONS, AV_FINAL)
+	arrancar consumidor(CALLE_PROD, CALLE_CONS, AV_FINAL)
+fin

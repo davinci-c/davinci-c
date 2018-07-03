@@ -1,0 +1,11 @@
+programa tp_4_3
+{
+Escriba un programa que le permita al robot dejar todos los papeles
+que lleva en su bolsa en la esquina (45,89).
+}
+comenzar
+	iniciar
+	Pos(45,89)
+	mientras(HayFlorEnLaBolsa)
+		depositarFlor
+fin

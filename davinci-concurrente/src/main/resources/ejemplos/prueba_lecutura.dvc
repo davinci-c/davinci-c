@@ -1,0 +1,12 @@
+programa prueba
+variables
+	txt:texto
+	num:numero
+	log:logico
+comenzar
+	informar("Valor inicial: ",txt," - ",num," - ",log)
+        pedir(txt)
+	pedir(num)
+	pedir(log)
+       	informar("Valor final :",txt," - ",num," - ",log)
+fin

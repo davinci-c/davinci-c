@@ -1,0 +1,16 @@
+programa tp_4_2
+{
+Escriba un programa que le permita al robot recorrer el perímetro del
+cuadrado determinado por (1,1) y (2,2) recogiendo, de ser posible, un
+papel en cada esquina
+}
+comenzar
+	iniciar
+	repetir 4
+		comenzar
+		si(HayPapelEnLaEsquina)
+			tomarPapel
+		mover
+		derecha
+		fin
+fin

@@ -1,0 +1,69 @@
+{
+	GANA el robot que llega a la calle 7 primero.
+	Se puede mejorar el algoritmo sincronizando la largada
+}
+
+programa carrera
+variables
+	sync:semaforoGeneral
+	continua:logico
+	comienza:semaforoBinario
+
+subprogramas 
+	procedimiento correr(en nombre:texto; en avenida:numero)
+	comenzar
+		iniciar
+		pos(avenida,1)
+		
+		
+		mientras continua &  (posCa <= 5)
+			    mover
+			
+		esperar(sync)
+		  si continua
+			comenzar
+			continua := f
+			mover
+			informar(nombre, " ganó la carrera.[",posAv,",",posCa,"]" )
+			fin
+		  sino
+			informar(nombre, " perdió.[",posAv,",",posCa,"]")
+		avisar(sync)
+
+	fin
+hilos
+	hilo robot1(en avenida:numero)
+	comenzar
+		correr("robot1", avenida)
+	fin
+
+	hilo robot2(en avenida:numero)
+	comenzar
+		correr("robot2", avenida)
+	fin
+
+	hilo robot3(en avenida:numero)
+	comenzar
+		correr("robot3",avenida)
+	fin
+
+	hilo robot4(en avenida:numero)
+	comenzar
+		correr("robot4",avenida)
+	fin
+
+	hilo robot5(en avenida:numero)
+	comenzar
+		correr("robot5",avenida)
+	fin
+
+comenzar
+	continua := v 
+	iniciarSemaforo(sync)
+	arrancar robot1(1)
+	arrancar robot2(2)
+	arrancar robot3(3)
+	arrancar robot4(4)
+	arrancar robot5(5)
+
+fin

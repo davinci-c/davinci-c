@@ -1,0 +1,23 @@
+programa prueba
+variables
+	boolean:logico
+hilos
+	hilo juan
+	comenzar
+		mientras ~(boolean)
+			informar("juan ok")
+		informar("juan termino")
+	fin
+
+	hilo pepe
+	comenzar
+		mientras ~(boolean)
+			informar("pepe ok")
+		informar("pepe termino")
+	fin
+comenzar
+	boolean := f
+	arrancar juan
+	arrancar pepe
+	informar("fin cuerpor principal")
+fin

@@ -1,0 +1,23 @@
+programa prueba
+variables
+	a:logico
+	b:logico
+	result : logico
+comenzar
+	a := v
+	b := f
+	result := a & b
+	informar(result, " es igual a ", a & b)
+
+	result := a | b
+	informar(result, " es igual a ", a | b)
+
+	result := ~a
+	informar(result, " es igual a ", ~a)
+
+	result := (a = b) 
+	informar( (a & b)|(~a & ~b), " es igual a ", result )
+
+	result := a <> b
+	informar((~a & b)|(a & ~b), " es igual a ", result)
+fin

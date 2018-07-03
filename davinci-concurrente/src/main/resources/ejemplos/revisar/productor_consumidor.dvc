@@ -1,0 +1,100 @@
+programa ProductorConsumidor
+
+variables
+	lleno:semaforoGeneral
+	vacio:semaforoGeneral
+	turno:semaforoBinario
+	avenida:numero
+	calle:numero
+
+subprogramas
+
+	procedimiento tomarFlorDeCuadrante
+	variables
+		tengoFlor:logico
+		av:numero
+		ca:numero
+	comenzar
+		tengoFlor := f
+		mientras ! tengoFlor
+			comenzar
+				av:= aleatorio(10)+1
+				ca:=aleatorio(10)+1
+				Pos(av,ca)
+				informar("verificando esquina ",av,",",ca,"  >>", HayFlorEnLaEsquina)
+				tengoFlor := HayFlorEnLaEsquina
+			fin
+			tomarFlor
+	fin
+
+	procedimiento depositarFlorEnCuadrante
+	variables
+		av:numero
+		ca:numero
+	comenzar
+		av:= aleatorio(10)+1
+		ca:=aleatorio(10)+1
+		Pos(av,ca)
+		informar("depositando en esquina ",av,",",ca)
+		depositarFlor
+	fin
+
+	procedimiento tomarFlorDeCalle(en av:numero; en ca:numero)
+	comenzar
+		Pos(av,ca)
+		tomarFlor
+		Informar("tome flor en la esquina ",av,",",ca)
+	fin
+
+	procedimiento depositarFlorEnCalle(en av:numero; en ca:numero)
+	comenzar
+		Pos(av,ca)
+		depositarFlor
+		Informar("deposite flor en la esquina ",av,",",ca)
+	fin
+
+hilos
+	hilo productor
+	comenzar
+		iniciar
+		mientras v
+			comenzar
+			tomarFlorDeCuadrante
+			esperar(vacio)
+			
+				esperar(turno)
+				avenida := avenida + 1
+				depositarFlorEnCalle(avenida,calle)
+				señalar(turno)
+
+			señalar(lleno)
+			fin
+	fin
+
+	hilo consumidor
+	comenzar
+		iniciar
+		mientras v
+			comenzar
+			
+			esperar(lleno)
+			
+				esperar(turno)
+				tomarFlorDeCalle(avenida,calle)
+				avenida := avenida - 1
+				señalar(turno)
+
+			señalar(vacio)
+			depositarFlorEnCuadrante
+			fin
+	fin
+
+comenzar
+	iniciarSemaforo(lleno,0)
+	iniciarSemaforo(vacio,100)
+	iniciarSemaforo(vacio,1)
+	avenida := 0
+	calle := 2
+	arrancar productor
+	arrancar consumidor
+fin

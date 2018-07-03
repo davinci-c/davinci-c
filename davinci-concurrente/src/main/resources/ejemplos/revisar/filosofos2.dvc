@@ -1,0 +1,177 @@
+programa filosofos_
+
+variables
+	AVENIDA:numero
+	CALLE:numero
+	N:numero
+
+	sillaLibre:semaforoGeneral
+
+	cubierto1:semaforoBinario
+	cubierto2:semaforoBinario
+	cubierto3:semaforoBinario
+	cubierto4:semaforoBinario
+	cubierto5:semaforoBinario
+
+subprogramas
+
+	procedimiento esperarCubiertos(en filosofo:numero)
+	comenzar
+		si(filosofo=1)
+			comenzar
+			esperar(cubierto1)
+			esperar(cubierto5)
+			fin
+		sino si (filosofo = 2)
+			comenzar
+			esperar(cubierto2)
+			esperar(cubierto1)
+			fin
+		sino si (filosofo = 3)
+			comenzar
+			esperar(cubierto3)
+			esperar(cubierto2)
+			fin
+		sino si (filosofo = 4)
+			comenzar
+			esperar(cubierto4)
+			esperar(cubierto3)
+			fin
+		sino 
+			comenzar
+			esperar(cubierto4)
+			esperar(cubierto5)
+			fin
+	fin
+
+	procedimiento señalarCubiertos(en filosofo:numero)
+	comenzar
+		si(filosofo=1)
+			comenzar
+			señalar(cubierto1)
+			señalar(cubierto5)
+			fin
+		sino si (filosofo = 2)
+			comenzar
+			señalar(cubierto2)
+			señalar(cubierto1)
+			fin
+		sino si (filosofo = 3)
+			comenzar
+			señalar(cubierto3)
+			señalar(cubierto2)
+			fin
+		sino si (filosofo = 4)
+			comenzar
+			señalar(cubierto4)
+			señalar(cubierto3)
+			fin
+		sino 
+			comenzar
+			señalar(cubierto4)
+			señalar(cubierto5)
+			
+			fin
+	fin
+
+	procedimiento estado(en filosofo:numero; en mensaje:texto)
+	comenzar
+		repetir aleatorio(10)
+			informar("filosofo ",filosofo, mensaje)
+	fin
+
+	procedimiento tomarCubiertos(en filosofo:numero)
+	variables
+		av:numero
+	comenzar
+
+		av := ((filosofo +3) % N)+AVENIDA
+		
+		//2 3 4 5 6
+		Pos(AVENIDA+(filosofo-1),CALLE) 
+		tomarFlor
+		
+		// 6 2 3 4 5
+		Pos(av ,CALLE) 
+		tomarFlor
+		
+	fin
+
+	procedimiento depositarCubiertos(en filosofo:numero)
+	variables
+		av:numero
+	comenzar
+		av := ((filosofo +3) % N)+AVENIDA
+		
+		//2 3 4 5 6
+		Pos(AVENIDA+(filosofo-1),CALLE) 
+		depositarFlor
+		
+		// 6 2 3 4 5
+		Pos(av ,CALLE) 
+		depositarFlor
+	fin
+
+	procedimiento iniciarFilosofo(en filosofo:numero)
+	comenzar
+		//inicializamos el robot
+		iniciar
+
+		//posicionamos el robot
+		Pos(AVENIDA+filosofo, CALLE)
+
+		mientras v
+			comenzar
+		
+			estado(filosofo," pensando....")
+	
+			//espero por los cubiertos de los costados del filosofo			
+			esperarCubiertos(filosofo)
+		
+			//levanta los cubierto (flores)
+			tomarCubiertos(filosofo)
+			
+			estado(filosofo," comiendo....")
+
+			//deposita los cubiertos(flores)			
+			depositarCubiertos(filosofo)
+
+			//deja disponibles los cubiertos de los cosatados del filosofo
+			señalarCubiertos(filosofo)
+	
+			fin
+	fin
+
+hilos
+	hilo filosofo1 comenzar 	iniciarFilosofo(1) fin
+	hilo filosofo2 comenzar 	iniciarFilosofo(2) fin
+	hilo filosofo3 comenzar 	iniciarFilosofo(3) fin
+	hilo	filosofo4 comenzar 	iniciarFilosofo(4) fin
+	hilo	filosofo5 comenzar 	iniciarFilosofo(5) fin
+
+comenzar
+	{
+		se debe distribuir una flor en las siguientes esquinas:
+	 	(av,ca): (2,2),(3,2),(4,2),(5,2),(6,2)
+	}
+	//inicilizamos las "constantes"
+	AVENIDA := 2
+	CALLE := 2
+
+	//cantidad de filosofos
+	N := 5
+
+	iniciarSemaforo(sillaLibre, N-1)
+
+	iniciarSemaforo(cubierto1,1)
+	iniciarSemaforo(cubierto2,1)
+	iniciarSemaforo(cubierto3,1)
+	iniciarSemaforo(cubierto4,1)
+	iniciarSemaforo(cubierto5,1)
+
+	arrancar filosofo1
+	arrancar filosofo2
+	arrancar filosofo3
+	arrancar filosofo4
+	arrancar filosofo5
+fin
